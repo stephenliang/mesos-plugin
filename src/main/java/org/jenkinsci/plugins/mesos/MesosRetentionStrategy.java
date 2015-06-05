@@ -49,11 +49,14 @@ public class MesosRetentionStrategy extends RetentionStrategy<MesosComputer> {
   @Override
   public long check(MesosComputer c) {
     if (!checkLock.tryLock()) {
+        LOGGER.info("There is a check lock" + checkLock.getHoldCount() + ", queue: " + checkLock.getQueueLength());
       return 1;
     } else {
       try {
+          LOGGER.info("Attempting to check the interval");
         return checkInternal(c);
       } finally {
+          LOGGER.info("Unlocking the checklock");
         checkLock.unlock();
       }
     }
@@ -62,6 +65,8 @@ public class MesosRetentionStrategy extends RetentionStrategy<MesosComputer> {
   private long checkInternal(MesosComputer c) {
     if (c.getNode() == null) {
       return 1;
+    } else {
+        LOGGER.info("Slave is null for computer " + c.getName());
     }
 
     // If we just launched this computer, check back after 1 min.
@@ -69,6 +74,9 @@ public class MesosRetentionStrategy extends RetentionStrategy<MesosComputer> {
     if ((System.currentTimeMillis() - c.getConnectTime()) <
         MINUTES.toMillis(idleTerminationMinutes)) {
       return 1;
+    } else {
+        LOGGER.info("Mesos computer " + c.getName() + " is not idle. Time = " + System.currentTimeMillis() +
+                ", Connect Time: " + c.getConnectTime() + ", idle term: " + idleTerminationMinutes);
     }
 
     // If the computer is offline, terminate it.
@@ -76,6 +84,8 @@ public class MesosRetentionStrategy extends RetentionStrategy<MesosComputer> {
       LOGGER.info("Disconnecting offline computer " + c.getName());
       c.getNode().terminate();
       return 1;
+    } else {
+        LOGGER.info("Mesos computer " + c.getName() + " is not offline");
     }
 
     // Terminate the computer if it is idle for longer than
@@ -86,8 +96,11 @@ public class MesosRetentionStrategy extends RetentionStrategy<MesosComputer> {
 
       if (idleMilliseconds > MINUTES.toMillis(idleTerminationMinutes)) {
         LOGGER.info("Disconnecting idle computer " + c.getName());
+          c.getNode().setPendingDelete(true);
         c.getNode().terminate();
       }
+    } else {
+        LOGGER.info("Mesos computer " + c.getName() + " is not idle. Time = " + System.currentTimeMillis() + ", idle start " + c.getIdleStartMilliseconds());
     }
     return 1;
   }

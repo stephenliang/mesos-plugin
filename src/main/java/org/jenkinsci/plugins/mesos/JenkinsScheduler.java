@@ -147,6 +147,7 @@ public class JenkinsScheduler implements Scheduler {
 
   public synchronized void stop() {
     if (driver != null) {
+        LOGGER.info("Attempting to stop the driver");
       driver.stop();
     } else {
       LOGGER.warning("Unable to stop Mesos driver:  driver is null.");
@@ -387,11 +388,20 @@ public class JenkinsScheduler implements Scheduler {
       LOGGER.fine("portRangesList=" + portRangesList);
 
       int portRangeIndex = 0;
+      LOGGER.info("ports to use size: " + portsToUse.size());
+      LOGGER.info("maxCount" + maxCount);
+      LOGGER.info("portRangeIndex" + portRangeIndex);
+      LOGGER.info("portRangeIndexSize: " + portRangesList.size());
+      LOGGER.info("portRangeList: " + portRangesList);
       while (portsToUse.size() < maxCount && portRangeIndex < portRangesList.size()) {
           Value.Range currentPortRange = portRangesList.get(portRangeIndex);
           long nextPort = currentPortRange.getBegin();
+          LOGGER.info("nexport = " + nextPort);
+          LOGGER.info("currentPortRange = " + currentPortRange);
+          LOGGER.info("currentPortRangeEnd = " + currentPortRange.getEnd());
 
-          while (portsToUse.size() < maxCount && nextPort < currentPortRange.getEnd()) {
+          while (portsToUse.size() < maxCount && nextPort <= currentPortRange.getEnd()) {
+              LOGGER.info("portstouse size = " + portsToUse.size());
               portsToUse.add((int)nextPort);
               nextPort++;
           }
@@ -683,6 +693,7 @@ public class JenkinsScheduler implements Scheduler {
    * sure JenkinsScheduler's request queue is empty.
    */
   public static void supervise() {
+      LOGGER.info("Supervising.....?");
 	SUPERVISOR_LOCK.lock();
     Collection<Mesos> clouds = Mesos.getAllClouds();
     for (Mesos cloud : clouds) {
