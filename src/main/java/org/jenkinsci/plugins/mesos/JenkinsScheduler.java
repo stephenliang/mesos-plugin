@@ -16,6 +16,7 @@
 package org.jenkinsci.plugins.mesos;
 
 
+import com.google.common.annotations.VisibleForTesting;
 import hudson.model.Node;
 
 import java.util.ArrayList;
@@ -376,8 +377,9 @@ public class JenkinsScheduler implements Scheduler {
     return slaveTypeMatch;
   }
 
-  private List<Integer> findPortsToUse(Offer offer, Request request, int maxCount) {
-      Set<Integer> portsToUse = new HashSet<Integer>();
+  @VisibleForTesting
+  List<Integer> findPortsToUse(Offer offer, Request request, int maxCount) {
+      List<Integer> portsToUse = new ArrayList<Integer>();
       List<Value.Range> portRangesList = null;
 
       for (Resource resource : offer.getResourcesList()) {
@@ -403,7 +405,6 @@ public class JenkinsScheduler implements Scheduler {
           LOGGER.info("currentPortRangeEnd = " + currentPortRange.getEnd());
 
           while (portsToUse.size() < maxCount && nextPort <= currentPortRange.getEnd()) {
-              LOGGER.info("portstouse size = " + portsToUse.size());
               portsToUse.add((int)nextPort);
               nextPort++;
           }
@@ -668,7 +669,8 @@ public class JenkinsScheduler implements Scheduler {
     }
   }
 
-  private class Request {
+  @VisibleForTesting
+  class Request {
     private final Mesos.SlaveRequest request;
     private final Mesos.SlaveResult result;
 
