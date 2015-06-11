@@ -379,7 +379,7 @@ public class JenkinsScheduler implements Scheduler {
 
   @VisibleForTesting
   List<Integer> findPortsToUse(Offer offer, Request request, int maxCount) {
-      List<Integer> portsToUse = new ArrayList<Integer>();
+      Set<Integer> portsToUse = new HashSet<Integer>();
       List<Value.Range> portRangesList = null;
 
       for (Resource resource : offer.getResourcesList()) {
