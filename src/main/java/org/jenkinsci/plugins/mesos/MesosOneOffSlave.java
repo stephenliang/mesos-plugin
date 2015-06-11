@@ -36,7 +36,6 @@ public class MesosOneOffSlave extends BuildWrapper {
                 public boolean tearDown(AbstractBuild build, final BuildListener listener) throws IOException, InterruptedException {
                     LOGGER.warning("Single-use slave " + c.getName() + " getting torn down.");
                     c.setTemporarilyOffline(true, OfflineCause.create(Messages._OneOffCause()));
-                    c.getNode().setPendingDelete(true);
                     return true;
                 }
             };
