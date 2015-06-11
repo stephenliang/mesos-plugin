@@ -21,11 +21,13 @@ import hudson.model.Node;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
@@ -375,7 +377,7 @@ public class JenkinsScheduler implements Scheduler {
   }
 
   private List<Integer> findPortsToUse(Offer offer, Request request, int maxCount) {
-      List<Integer> portsToUse = new ArrayList<Integer>();
+      Set<Integer> portsToUse = new HashSet<Integer>();
       List<Value.Range> portRangesList = null;
 
       for (Resource resource : offer.getResourcesList()) {
@@ -407,7 +409,7 @@ public class JenkinsScheduler implements Scheduler {
           }
       }
 
-      return portsToUse;
+      return new ArrayList<Integer>(portsToUse);
   }
 
   private void createMesosTask(Offer offer, Request request) {

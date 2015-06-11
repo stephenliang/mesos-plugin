@@ -22,10 +22,6 @@ public class MesosOneOffSlave extends BuildWrapper {
     public MesosOneOffSlave() {
     }
 
-    //
-    // convert Jenkins staticy stuff into pojos; performing as little critical stuff here as
-    // possible, as this method is very hard to test due to static usage, etc.
-    //
     @Override
     @SuppressWarnings("rawtypes")
     public Environment setUp(AbstractBuild build, Launcher launcher, final BuildListener listener) {
@@ -34,7 +30,7 @@ public class MesosOneOffSlave extends BuildWrapper {
             return new Environment() {
                 @Override
                 public boolean tearDown(AbstractBuild build, final BuildListener listener) throws IOException, InterruptedException {
-                    LOGGER.warning("Single-use slave " + c.getName() + " getting torn down.");
+                    LOGGER.warning("Single-use slave " + c.getName() + " is getting torn down.");
                     c.setTemporarilyOffline(true, OfflineCause.create(Messages._OneOffCause()));
                     return true;
                 }
@@ -43,7 +39,7 @@ public class MesosOneOffSlave extends BuildWrapper {
             return new Environment() {
                 @Override
                 public boolean tearDown(AbstractBuild build, final BuildListener listener) throws IOException, InterruptedException {
-                    LOGGER.warning("Not a single use slave, this is a " + build.getExecutor().getOwner().getClass());
+                    LOGGER.fine("Not a single use slave, this is a " + build.getExecutor().getOwner().getClass());
                     return true;
                 }
             };
@@ -55,7 +51,7 @@ public class MesosOneOffSlave extends BuildWrapper {
     public static final class DescriptorImpl extends BuildWrapperDescriptor {
         @Override
         public String getDisplayName() {
-            return "JClouds Single-Use Slave";
+            return "Mesos Single-Use Slave";
         }
 
         @Override
